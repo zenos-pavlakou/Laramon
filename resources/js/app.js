@@ -10,25 +10,6 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
 
-import DonutChart from "./components/DonutChart.vue";
-Vue.component("donut", DonutChart);
-
-import ProgressBar from "./components/ProgressBar.vue";
-Vue.component("progress-bar", ProgressBar);
-
-
-import Typewriter from "./components/Typewriter.vue";
-Vue.component("typewriter", Typewriter);
-
-
-import WorkExperience from "./components/WorkExperience.vue";
-Vue.component("work-experience", WorkExperience);
-
-
-import Education from "./components/Education.vue";
-Vue.component("education", Education);
-
-
 import $ from "jquery";
 import axios from "axios";
  
