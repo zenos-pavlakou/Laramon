@@ -1,0 +1,30 @@
+@import 'variables';
+
+@mixin light-component-theme($theme: rgb(44,44,55)) {
+  background: $theme;
+  .title {
+  	color:rgba(250,250,250,0.95);
+  }
+  p, span {
+  	color: #8c8c8e;
+  }
+  .cta {
+  	color: #FFC107;
+  	text-decoration:none;
+  }
+}
+
+
+@mixin dark-component-theme($theme: rgb(32,32,42)) {
+  background: $theme;
+  .title {
+    color:rgba(250,250,250,0.95);
+  }
+  p, span {
+    color: #8c8c8e;
+  }
+  .cta {
+    color: #FFC107;
+    text-decoration:none;
+  }
+}

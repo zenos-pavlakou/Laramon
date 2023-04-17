@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\{{modelName}};
+
+class {{controllerName}} extends MongoCRUDController
+{
+    public function __construct({{modelName}} $model)
+    {
+        parent::__construct($model);
+    }
+}
