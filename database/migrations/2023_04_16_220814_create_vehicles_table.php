@@ -17,7 +17,8 @@ return new class extends Migration
             Schema::create('vehicles', function (Blueprint $table) {
                 $table->id();
                 $table->timestamps();
-                $table->string("license_plate");
+                $table->string("license_plate")->unique();
+                $table->index('license_plate');
                 $table->string("make");
             });
         }

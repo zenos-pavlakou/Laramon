@@ -12,12 +12,14 @@ To begin building your API, first you must create the migration files. For examp
 
 Once the migration file is created, enter all the column names and types in the `up()` function of the newly created migration file. Below is a simple example.
 
-     public function up() {
+    public function up()
+    {
         if (!Schema::hasCollection('vehicles')) {
             Schema::create('vehicles', function (Blueprint $table) {
                 $table->id();
                 $table->timestamps();
-                $table->string("license_plate");
+                $table->string("license_plate")->unique();
+                $table->index('license_plate');
                 $table->string("make");
             });
         }
