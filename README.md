@@ -27,7 +27,7 @@ Once your migration file is ready, run the migration with the following command 
 
 ### Generating the CRUD API for the newly created collection
 
-To generate the CRUD API for your new collection, simply run `php artisan scaffold:mongo-collection Vehicle`. Once you have run this command, a new controller will have been generated called <b>VehicleController</b> which extends the <b>MongoCRUDController</b>. The MongoCRUDController defines all the functions for performing CRUD operations. You can override the functions in the designated sub-class of the MongoCRUDController, which in this case would be the VehicleController. 
+To generate the CRUD API for your new collection, simply run `php artisan crudify:mongo-collection Vehicle`. Once you have run this command, a new controller will have been generated called <b>VehicleController</b> which extends the <b>MongoCRUDController</b>. The MongoCRUDController defines all the functions for performing CRUD operations. You can override the functions in the designated sub-class of the MongoCRUDController, which in this case would be the VehicleController. 
 
 In addition, the Model for the Vehicle collection will also have been generated in the `/app` directory. Below is an example of what the generated model will look like. 
 
@@ -58,4 +58,4 @@ Finally, the last bit of code which is generated are all the CRUD routes for the
 	    Route::post('/vehicle', 'VehicleController@store');
 	    // ==================== END OF CRUD ROUTES FOR Vehicle ==============
 
-You can test the routes immediately right after running the `php artisan scaffold:mongo-collection Vehicle` command.
+You can test the routes immediately right after running the `php artisan crudify:mongo-collection Vehicle` command.

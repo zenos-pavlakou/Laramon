@@ -13,7 +13,7 @@ class GenerateMongoModel extends Command
      *
      * @var string
      */
-    protected $signature = 'scaffold:mongo-collection {name : The name of the collection}';
+    protected $signature = 'crudify:mongo-collection {name : The name of the collection}';
 
     /**
      * The console command description.
