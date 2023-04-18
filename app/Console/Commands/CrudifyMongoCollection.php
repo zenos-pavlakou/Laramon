@@ -93,6 +93,7 @@ class CrudifyMongoCollection extends Command
             foreach ($columns as $columnName => $columnType) {
                 $cols .= "'" . $columnName . "', ";
             }
+            $cols = substr($cols, 0, strlen($cols) - 2);
             $cols .= "]";
         } else {
             $cols = "[]";
