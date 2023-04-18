@@ -9,3 +9,11 @@ Route::put('/user-profiles/{id}', 'UserProfileController@update');
 Route::delete('/user-profiles/{id}', 'UserProfileController@destroy');
 Route::post('/user-profiles', 'UserProfileController@store');
 
+
+
+
+
+
+
+
+
