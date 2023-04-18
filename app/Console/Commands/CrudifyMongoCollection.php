@@ -177,9 +177,9 @@ class CrudifyMongoCollection extends Command
 
         $file_path = base_path('app/' . $modelName . '.php');
 
-        // if (File::exists($file_path)) {
-        //     $this->info('The ' . $modelName . ' model already exists. Skipping...');
-        // } else {
+        if (File::exists($file_path)) {
+            $this->info('The ' . $modelName . ' model already exists. Skipping...');
+        } else {
             $stub = File::get(base_path('stubs/mongodb-model.stub'));
             $stub = str_replace('{{modelName}}', $modelName, $stub);
             $stub = str_replace("{{collectionName}}", "'" . $this->camelCaseToSnakeCase($modelName) . "s'", $stub);
@@ -187,7 +187,7 @@ class CrudifyMongoCollection extends Command
             $fileName = $modelName . '.php';
             File::put(app_path('/' . $fileName), $stub);
             $this->info($modelName . ' model created successfully.');
-        // }
+        }
 
         //CREATES THE CONTROLLER
         $name = $this->argument('name');
