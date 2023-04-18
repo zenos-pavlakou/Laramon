@@ -34,12 +34,64 @@ class CrudifyMongoCollection extends Command
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $input));
     }
 
-    public function routeExists($route) {
-        $existingRoutes = file_get_contents(base_path('routes/web.php'));
-        if (strpos($existingRoutes, $route) !== false) {
+    public function strHasSubString($str, $subStr) {
+        if (strpos($str, $subStr) !== false) {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public function routeExists($route) {
+        $existingRoutes = file_get_contents(base_path('routes/web.php'));
+        return $this->strHasSubString($existingRoutes, $route);
+    }
+
+    public function getPropertyNames($contents) {
+        preg_match("/\['\$jsonSchema'\] \=\> (\[[^\]]*\])/s", $contents, $matches);
+        $schema = isset($matches[1]) ? json_decode($matches[1], true) : [];
+
+        $fields = [];
+        foreach ($schema['properties'] as $key => $value) {
+            $fields[] = $key;
+        }
+
+        return $fields;
+    }
+
+
+    public function hasJsonSchema($contents){
+        try {
+            $jsonSchemaStart = strpos($contents, '$jsonSchema');
+            if ($jsonSchemaStart !== false) {
+                $jsonSchemaEnd = strpos($contents, ']);', $jsonSchemaStart);
+                if ($jsonSchemaEnd !== false) {
+                    $jsonSchemaContent = substr($contents, $jsonSchemaStart, $jsonSchemaEnd - $jsonSchemaStart + 1);
+                    $jsonSchemaContent = str_replace("\n", "", $jsonSchemaContent);
+
+                    // Remove $jsonSchema' =>
+                    $jsonSchemaContent = str_replace('$jsonSchema\' => ', '', $jsonSchemaContent);
+
+                    // Remove last ]
+                    $jsonSchemaContent = substr($jsonSchemaContent, 0, strrpos($jsonSchemaContent, ']'));
+                    $jsonSchemaContent = substr($jsonSchemaContent, 0, strrpos($jsonSchemaContent, ']'));
+                    $jsonSchemaContent = str_replace("'", '"', $jsonSchemaContent);
+                    $jsonSchemaContent = preg_replace('/\s+/', "", $jsonSchemaContent);
+
+                    eval('$jsonSchemaContent = ' . $jsonSchemaContent . ';');
+                    
+                    $fieldNames = isset($jsonSchemaData['properties']) ? array_keys($jsonSchemaData['properties']) : [];
+                    return [
+                        "has_schema" => true,
+                        "field_names" => array_keys($jsonSchemaContent["properties"])
+                    ];
+                }
+            }
+        } catch (Exception $e) {
+            return [
+                "has_schema" => false,
+                "field_names" => []
+            ];
         }
     }
 
@@ -79,25 +131,43 @@ class CrudifyMongoCollection extends Command
         //DETECTS COLUMNS
         $fileName = $fileNames[0]; //TODO, MAYBE MAKE IT CHECK ALL FILES?
         $contents = file_get_contents($file);
-        preg_match('/Schema::create\(\'(.*)\', function \(Blueprint \$table\)/', $contents, $matches);
-        $tableName = $matches[1];
-        $columns = [];
-        preg_match_all('/\$table->([a-zA-Z]+)\([\'"]([a-zA-Z_\d]+)[\'"]/', $contents, $matches);
-        foreach ($matches[1] as $i => $type) {
-            $columnName = $matches[2][$i];
-            $columns[$columnName] = $type;
-        }
-        $this->info("Table: $tableName");
-        if(count($columns) > 0) {
-            $cols = "[";
-            foreach ($columns as $columnName => $columnType) {
-                $cols .= "'" . $columnName . "', ";
+
+        if($this->strHasSubString($contents, "DB::connection('mongodb')")) {
+
+            $hasJsonSchema = $this->hasJsonSchema($contents);
+            
+            if($hasJsonSchema["has_schema"] == true) {
+
+                $fieldNames = $hasJsonSchema['field_names'];
+
+                $cols = json_encode($fieldNames);
+                
+            } else {
+                $cols = "[]";
             }
-            $cols = substr($cols, 0, strlen($cols) - 2);
-            $cols .= "]";
+
         } else {
-            $cols = "[]";
+            preg_match('/Schema::create\(\'(.*)\', function \(Blueprint \$table\)/', $contents, $matches);
+            $tableName = $matches[1];
+            $columns = [];
+            preg_match_all('/\$table->([a-zA-Z]+)\([\'"]([a-zA-Z_\d]+)[\'"]/', $contents, $matches);
+            foreach ($matches[1] as $i => $type) {
+                $columnName = $matches[2][$i];
+                $columns[$columnName] = $type;
+            }
+            $this->info("Table: $tableName");
+            if(count($columns) > 0) {
+                $cols = "[";
+                foreach ($columns as $columnName => $columnType) {
+                    $cols .= "'" . $columnName . "', ";
+                }
+                $cols = substr($cols, 0, strlen($cols) - 2);
+                $cols .= "]";
+            } else {
+                $cols = "[]";
+            }
         }
+
 
 
 
@@ -107,9 +177,9 @@ class CrudifyMongoCollection extends Command
 
         $file_path = base_path('app/' . $modelName . '.php');
 
-        if (File::exists($file_path)) {
-            $this->info('The ' . $modelName . ' model already exists. Skipping...');
-        } else {
+        // if (File::exists($file_path)) {
+        //     $this->info('The ' . $modelName . ' model already exists. Skipping...');
+        // } else {
             $stub = File::get(base_path('stubs/mongodb-model.stub'));
             $stub = str_replace('{{modelName}}', $modelName, $stub);
             $stub = str_replace("{{collectionName}}", "'" . $this->camelCaseToSnakeCase($modelName) . "s'", $stub);
@@ -117,7 +187,7 @@ class CrudifyMongoCollection extends Command
             $fileName = $modelName . '.php';
             File::put(app_path('/' . $fileName), $stub);
             $this->info($modelName . ' model created successfully.');
-        }
+        // }
 
         //CREATES THE CONTROLLER
         $name = $this->argument('name');

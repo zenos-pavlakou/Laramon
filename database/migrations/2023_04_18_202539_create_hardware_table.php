@@ -13,12 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasCollection('user_profiles')) {
-            Schema::create('user_profiles', function (Blueprint $table) {
+        if (!Schema::hasCollection('hardware')) {
+            Schema::create('hardware', function (Blueprint $table) {
                 $table->id();
                 $table->timestamps();
             });
         }
+        
     }
 
     /**
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_profiles');
+        Schema::dropIfExists('hardware');
     }
 };
