@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 
 
-class GenerateMongoModel extends Command 
+class CrudifyMongoCollection extends Command 
 {
     /**
      * The name and signature of the console command.
@@ -131,7 +131,6 @@ class GenerateMongoModel extends Command
 
 
         //ADDS THE ROUTES
-
         $endpoint = $this->camelToHyphen($modelName);
         $segments = explode('_', $endpoint);
         $lastSegment = end($segments); 
