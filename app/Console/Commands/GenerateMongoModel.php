@@ -34,6 +34,15 @@ class GenerateMongoModel extends Command
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $input));
     }
 
+    public function routeExists($route) {
+        $existingRoutes = file_get_contents(base_path('routes/web.php'));
+        if (strpos($existingRoutes, $route) !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Execute the console command.
      *
@@ -115,7 +124,6 @@ class GenerateMongoModel extends Command
 
 
         //ADDS THE ROUTES
-        file_put_contents(base_path('routes/web.php'), "\n// ==================== CRUD ROUTES FOR " . $modelName . " ====================", FILE_APPEND);
 
         $endpoint = $this->camelToHyphen($modelName);
         $segments = explode('_', $endpoint);
@@ -124,20 +132,33 @@ class GenerateMongoModel extends Command
         $endpoint = str_replace($lastSegment, $pluralizedLastSegment, $endpoint);
 
         $indexRoute = "\nRoute::get('/$endpoint', '$controllerName@index');";
-        file_put_contents(base_path('routes/web.php'), $indexRoute, FILE_APPEND);
+
+        if(!$this->routeExists($indexRoute)) {
+            file_put_contents(base_path('routes/web.php'), $indexRoute, FILE_APPEND);
+        }
+
 
         $showRoute = "\nRoute::get('/$endpoint/{id}', '$controllerName@show');";
-        file_put_contents(base_path('routes/web.php'), $showRoute, FILE_APPEND);
+        if(!$this->routeExists($showRoute)) {
+            file_put_contents(base_path('routes/web.php'), $showRoute, FILE_APPEND);
+        }
 
         $updateRoute = "\nRoute::put('/$endpoint/{id}', '$controllerName@update');";
-        file_put_contents(base_path('routes/web.php'), $updateRoute, FILE_APPEND);
+        if(!$this->routeExists($updateRoute)) {
+            file_put_contents(base_path('routes/web.php'), $updateRoute, FILE_APPEND);
+        }
 
         $destroyRoute = "\nRoute::delete('/$endpoint/{id}', '$controllerName@destroy');";
-        file_put_contents(base_path('routes/web.php'), $destroyRoute, FILE_APPEND);
+        if(!$this->routeExists($destroyRoute)) {
+            file_put_contents(base_path('routes/web.php'), $destroyRoute, FILE_APPEND);
+        }
 
-        $storePath = "\nRoute::post('/$endpoint', '$controllerName@store');";
-        file_put_contents(base_path('routes/web.php'), $storePath, FILE_APPEND);
-        file_put_contents(base_path('routes/web.php'), "\n// ==================== END OF CRUD ROUTES FOR " . $modelName . " ====================\n", FILE_APPEND);
+        $storeRoute = "\nRoute::post('/$endpoint', '$controllerName@store');";
+        if(!$this->routeExists($storeRoute)) {
+            file_put_contents(base_path('routes/web.php'), $storeRoute, FILE_APPEND);
+        }
+
+        file_put_contents(base_path('routes/web.php'), "\n\n", FILE_APPEND);
         $this->info($modelName . ' CRUD routes created successfully.');
 
         return 0;
