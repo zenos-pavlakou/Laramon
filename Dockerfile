@@ -26,37 +26,32 @@ libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 lib
 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3  \
 lsb-release xdg-utils wget
 
-RUN mkdir /usr/src/app/personal_website
-
 RUN apt-get update && apt-get install -y git
 
-RUN git clone https://github.com/zenos-pavlakou/personal-website /usr/src/app/personal_website
+RUN mkdir /usr/src/app/laravel_app
 
+COPY . /usr/src/app/laravel_app
 
 COPY ./extra_files/git_setup.sh /usr/src/app/git_setup.sh
 RUN chmod 777 /usr/src/app/git_setup.sh
 
 
-COPY .env /usr/src/app/personal_website
+COPY .env /usr/src/app/laravel_app
 
 
 COPY ./extra_files/php.ini /usr/local/etc/php/php.ini
 
 
-WORKDIR /usr/src/app/personal_website
+WORKDIR /usr/src/app/laravel_app
+
+RUN pecl install mongodb
 
 RUN composer update --ignore-platform-reqs
 RUN composer install --ignore-platform-reqs
-RUN composer require spatie/laravel-cookie-consent
-RUN composer require spatie/laravel-server-side-rendering --ignore-platform-reqs
 RUN apt install python2 -y
 RUN apt install python3 -y
-RUN apt install iputils-ping -y
-RUN rm package-lock.json
+
 RUN npm install -g npm@latest
-
-
-
 
 
 SHELL ["/bin/bash", "--login", "-c"]
@@ -67,17 +62,9 @@ RUN nvm install 10.15.3
 
 
 
-
-
 RUN nvm install 14
 RUN nvm use 14
-#RUN npm cache clear
-#RUN npm install
-#RUN git stash
-#RUN git checkout develop
-#RUN > ~/.git-credentials
-#RUN apt-get update && apt-get install -y openssh-server
-#RUN mkdir /var/run/sshd
+
 
 
 EXPOSE 22

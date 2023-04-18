@@ -5,8 +5,11 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
-class GenerateMongoModel extends Command
+
+
+class GenerateMongoModel extends Command 
 {
     /**
      * The name and signature of the console command.
@@ -22,7 +25,6 @@ class GenerateMongoModel extends Command
      */
     protected $description = 'Generates a fully functioning CRUD API for the MongoDB collection';
 
-
     public function camelToHyphen($str) {
       $str = preg_replace('/(?<!^)([A-Z])/', '-$1', $str); // insert a hyphen before every uppercase letter that's not at the beginning of the string
       return strtolower($str); // convert to lowercase
@@ -32,7 +34,6 @@ class GenerateMongoModel extends Command
         return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $input));
     }
 
-
     /**
      * Execute the console command.
      *
@@ -41,10 +42,13 @@ class GenerateMongoModel extends Command
     public function handle()
     {
 
-
         //CHECKS IF MIGRATION FILE EXISTS
         $name = $this->camelCaseToSnakeCase($this->argument('name'));
-        $name .= "s_table.php";
+        $segments = explode('_', $name);
+        $lastSegment = end($segments); 
+        $pluralizedLastSegment = Str::plural($lastSegment);
+        $name = str_replace($lastSegment, $pluralizedLastSegment, $name);
+        $name .= "_table.php";
         $timestamp_pattern = '/^\d{4}_\d{2}_\d{2}_\d{6}_/';
         $pattern = database_path('migrations/*' . preg_replace($timestamp_pattern, '', $name));
         $files = glob($pattern);
@@ -64,8 +68,7 @@ class GenerateMongoModel extends Command
         }
 
         //DETECTS COLUMNS
-        $fileName = $fileNames[0];
-
+        $fileName = $fileNames[0]; //TODO, MAYBE MAKE IT CHECK ALL FILES?
         $contents = file_get_contents($file);
         preg_match('/Schema::create\(\'(.*)\', function \(Blueprint \$table\)/', $contents, $matches);
         $tableName = $matches[1];
@@ -75,14 +78,16 @@ class GenerateMongoModel extends Command
             $columnName = $matches[2][$i];
             $columns[$columnName] = $type;
         }
-
         $this->info("Table: $tableName");
-        $cols = "[";
-        foreach ($columns as $columnName => $columnType) {
-            $cols .= "'" . $columnName . "', ";
+        if(count($columns) > 0) {
+            $cols = "[";
+            foreach ($columns as $columnName => $columnType) {
+                $cols .= "'" . $columnName . "', ";
+            }
+            $cols .= "]";
+        } else {
+            $cols = "[]";
         }
-        $cols = substr($cols, 0, strlen($cols) - 2);
-        $cols .= "]";
 
 
 
@@ -111,7 +116,13 @@ class GenerateMongoModel extends Command
 
         //ADDS THE ROUTES
         file_put_contents(base_path('routes/web.php'), "\n// ==================== CRUD ROUTES FOR " . $modelName . " ====================", FILE_APPEND);
+
         $endpoint = $this->camelToHyphen($modelName);
+        $segments = explode('_', $endpoint);
+        $lastSegment = end($segments); 
+        $pluralizedLastSegment = Str::plural($lastSegment);
+        $endpoint = str_replace($lastSegment, $pluralizedLastSegment, $endpoint);
+
         $indexRoute = "\nRoute::get('/$endpoint', '$controllerName@index');";
         file_put_contents(base_path('routes/web.php'), $indexRoute, FILE_APPEND);
 
@@ -128,8 +139,6 @@ class GenerateMongoModel extends Command
         file_put_contents(base_path('routes/web.php'), $storePath, FILE_APPEND);
         file_put_contents(base_path('routes/web.php'), "\n// ==================== END OF CRUD ROUTES FOR " . $modelName . " ====================\n", FILE_APPEND);
         $this->info($modelName . ' CRUD routes created successfully.');
-
-
 
         return 0;
     }

@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasCollection('user_info_change_requests')) {
-            Schema::create('user_info_change_requests', function (Blueprint $table) {
+        if (!Schema::hasCollection('user_profiles')) {
+            Schema::create('user_profiles', function (Blueprint $table) {
                 $table->id();
                 $table->timestamps();
-                $table->integer("user_id");
-                $table->string("email_address");
-                $table->string("home_address");
-                $table->string("status");
             });
         }
     }
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_info_change_requests');
+        Schema::dropIfExists('user_profiles');
     }
 };
