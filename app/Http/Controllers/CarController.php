@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Hardware;
+use App\Car;
 
-class HardwareController extends MongoCRUDController
+class CarController extends MongoCRUDController
 {
-    public function __construct(Hardware $model)
+    public function __construct(Car $model)
     {
         parent::__construct($model);
     }

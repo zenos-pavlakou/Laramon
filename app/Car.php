@@ -4,10 +4,10 @@ namespace App;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class Hardware extends Eloquent
+class Car extends Eloquent
 {
     protected $connection = 'mongodb';
-    protected $collection = 'hardwares';
-    protected $fillable = [];
+    protected $collection = 'cars';
+    protected $fillable = ['field_1'];
 }
   

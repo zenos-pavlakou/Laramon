@@ -13,23 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasCollection('electronic_devices')) {
+        if (!Schema::hasCollection('mongo_examples')) {
 
-            DB::connection('mongodb')->getMongoDB()->createCollection('electronic_devices', [
+            DB::connection('mongodb')->getMongoDB()->createCollection('mongo_examples', [
                 'validator' => [
                     '$jsonSchema' => [
                         'bsonType' => 'object',
-                        'required' => ['name', 'make'],
+                        'required' => ['field_1', 'field_2'],
                         'properties' => [
-                            'name' => [
+                            'field_1' => [
                                 'bsonType' => 'string',
                                 'description' => 'required field'
                             ],
-                            'make' => [
+                            'field_2' => [
                                 'bsonType' => 'string',
                                 'description' => 'required field'
                             ],
-                            'price' => [
+                            'field_3' => [
                                 'bsonType' => 'int',
                                 'minimum' => 18,
                                 'description' => 'optional field'
@@ -38,7 +38,6 @@ return new class extends Migration
                     ]
                 ]
             ]);
-
         }
         
     }
@@ -50,6 +49,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('electronic_devices');
+        Schema::dropIfExists('mongo_examples');
     }
 };

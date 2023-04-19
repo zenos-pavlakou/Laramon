@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasCollection('hardware')) {
-            Schema::create('hardware', function (Blueprint $table) {
+        if (!Schema::hasCollection('cars')) {
+            Schema::create('cars', function (Blueprint $table) {
                 $table->id();
                 $table->timestamps();
             });
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hardware');
+        Schema::dropIfExists('cars');
     }
 };

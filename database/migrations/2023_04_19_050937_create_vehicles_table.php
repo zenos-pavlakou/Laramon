@@ -13,29 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasCollection('cars')) {
-            Schema::create('cars', function (Blueprint $table) {
-                $table->id();
-                $table->timestamps();
-            });
+        if (!Schema::hasCollection('vehicles')) {
 
-            //Uncomment the code below to add validation rules. If you uncomment this code below,
-            //make sure to comment out the Schema::create function. 
-            /*DB::connection('mongodb')->getMongoDB()->createCollection('cars', [
+            DB::connection('mongodb')->getMongoDB()->createCollection('vehicles', [
                 'validator' => [
                     '$jsonSchema' => [
                         'bsonType' => 'object',
-                        'required' => ['name', 'email'],
+                        'required' => ['field_1', 'field_2'],
                         'properties' => [
-                            'name' => [
+                            'field_1' => [
                                 'bsonType' => 'string',
                                 'description' => 'required field'
                             ],
-                            'email' => [
+                            'field_2' => [
                                 'bsonType' => 'string',
                                 'description' => 'required field'
                             ],
-                            'age' => [
+                            'field_3' => [
                                 'bsonType' => 'int',
                                 'minimum' => 18,
                                 'description' => 'optional field'
@@ -43,7 +37,7 @@ return new class extends Migration
                         ]
                     ]
                 ]
-            ]);*/
+            ]);
         }
         
     }
@@ -55,6 +49,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cars');
+        Schema::dropIfExists('vehicles');
     }
 };
